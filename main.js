@@ -285,7 +285,7 @@ function sendEmail(name) {
 
 function enroll() {
     console.log("Entering Enroll");
-    execFile("phantomjs", ["enroll.js", "COM SCI", "180"], null, function (err, stdout, stderr) {
+    execFile("phantomjs", ["enroll.js", "COM SCI", "174B"], null, function (err, stdout, stderr) {
         //console.log("execFileSTDOUT:", JSON.stringify(stdout))
         //console.log("execFileSTDERR:", JSON.stringify(stderr))
         //uncomment if you want to see the ugly unformatted output

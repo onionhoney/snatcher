@@ -2,8 +2,8 @@ var system = require('system');
 var args = system.args;
 /*var area = args[4],
 	course = courseParser(args[5]);*/
-var area = "MATH",
-    course = courseParser("3C");
+var area = "COM SCI",
+    course = courseParser("174B");
 var fs = require('fs');
 var config = JSON.parse(fs.read('config.json', 'utf8'));
 
