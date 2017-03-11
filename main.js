@@ -109,8 +109,8 @@ steps = [
     function() {
         console.log("Another round --- Wait for it");
         setTimeout(function() {
-            //testindex = 3;
-            //page.reload();
+            testindex = 3;
+            page.reload();
         }, 180000);
         
     },
@@ -227,8 +227,10 @@ function getCourse(getCourseDOM, courses) {
 function poll() {
     var result = page.evaluate(getCourse, getCourseDOM, config.courses);
     if (result.length > 0) {
-        //sendEmail(result);
-        enroll();
+        sendEmail(result);
+        for (var i = 0; i < result.length; i++) {
+            enroll(result[i]);
+        }
     }
     /*for (var i = 0; i < result.length; i++) {
       var course = result[i];
@@ -283,10 +285,14 @@ function sendEmail(name) {
 
 }
 
-function enroll() {
-    console.log("Entering Enroll");
-    execFile("phantomjs", ["enroll.js", "COM SCI", "174B"], null, function (err, stdout, stderr) {
-        //console.log("execFileSTDOUT:", JSON.stringify(stdout))
+function enroll(course) {
+    var parts = course.split(' ');
+    var last = parts.length - 1;
+    var num = parts.splice(last, 1)[0];
+    var area = parts.join(' ');
+    console.log("Entering enroll for " + area + " " + num);
+    execFile("phantomjs", ["enroll.js", area, num], null, function (err, stdout, stderr) {
+        console.log("execFileSTDOUT:", JSON.stringify(stdout))
         //console.log("execFileSTDERR:", JSON.stringify(stderr))
         //uncomment if you want to see the ugly unformatted output
     })

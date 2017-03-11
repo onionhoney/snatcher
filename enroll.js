@@ -3,7 +3,7 @@ var args = system.args;
 /*var area = args[4],
 	course = courseParser(args[5]);*/
 var area = "COM SCI",
-    course = courseParser("180");
+    course = courseParser("174B");
 var fs = require('fs');
 var config = JSON.parse(fs.read('config.json', 'utf8'));
 
@@ -39,26 +39,24 @@ steps = [
 
     },
     function() {
-        //console.log("Step 3 - Wait myUCLA to login user.");
-    },
-    function() {
         var loaded = page.evaluate(function() {
             var sel = document.getElementById("optSelectTerm");
             return sel;
         });
         if (!loaded) {
             testindex = 2;
+            console.log("still not into class enroll");
             return;
         }
 
-        //console.log("Step 4 - Switch to term 17S");
+        console.log("Switch to term 17S");
         page.evaluate(function(config) {
             var sem = config.semester;
             var sel = document.getElementById("optSelectTerm");
             var opts = sel.options;
             for (var j = 0; j < opts.length; j++) {
                 var opt = opts[j];
-                //console.log("Trying selector value ", opt.value);
+                console.log("Trying selector value ", opt.value);
                 if (opt.value == sem) {
                     sel.selectedIndex = j;
                     break;
@@ -67,7 +65,7 @@ steps = [
 
             $("#select_filter_subject").click();
 
-            //console.log("ready to trigger");
+            console.log("ready to trigger");
             var items = $("ul").filter(function(){
                 return this.id.match(/ui-id-.*/);
             });
@@ -75,19 +73,17 @@ steps = [
             tmp.querySelector("li>a").click();
         }, config);
 
-        //console.log("rendered select area");
     },
     function() {
         var check = page.evaluate(function() {
             var label = document.getElementById("div_catalog").style.display;
             return label;
         });
-        page.render("click1.png");
         if (check != "block") {
             testindex--;
-            //console.log("Not yet!");
+            console.log("Not ready to write subject_area");
         } else {
-            //console.log("YES!!");
+            console.log("YES to write subject_area");
             page.evaluate(function(area){
                 document.getElementById("select_filter_subject").value = area;
                 document.getElementById("subject_area").value = area;
@@ -106,12 +102,11 @@ steps = [
             var label = document.getElementById("catalog").value;
             return label;
         });
-        page.render("click2.png");
         if (!check) {
             testindex--;
-            //console.log("Not yet!");
+            console.log("Not yet to write course");
         } else {
-            //console.log("YES AGAIN!!");
+            console.log("YES to write course");
             page.evaluate(function(course){
                 document.getElementById("select_filter_catalog").value = course;
                 document.getElementById("catalog").value = course;
@@ -127,10 +122,10 @@ steps = [
         page.render("now.png");
         if (! check) {
             testindex--;
-            //console.log("Not loaded yet");
+            console.log("Not loaded yet to enroll");
         } else {
-            //console.log("Course loaded");
-        	page.render("Loaded.png");
+            console.log("Yes to enroll");
+        	page.render("now.png");
             page.evaluate(function(){
                 var items = $("div").filter(function(){
                     return this.id.match(/.*children/)
@@ -145,18 +140,26 @@ steps = [
                     }
                 }
             });
-            page.render("enroll.png");
+            page.render("now.png");
         }
     },
     function() {
         var check = page.evaluate(function(){
             var items = $("div").filter(function(){
-                return this.id.match(/.*children/)
+                this.id.match(/.*children/)
             });
+            if (! items) {
+                var enrollBtn = $("#btn_Enroll");
+                if (enrollBtn) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
             for(var i = 0; i < items.length; i++) {
                 var lec = items[i];
                 var status = lec.querySelector(".statusColumn>p").innerText;
-                //console.log(status);
+                console.log(status);
                 if (status.toLowerCase().indexOf("full") === -1 &&
                     status.toLowerCase().indexOf("closed") === -1) {
                     var discussions = lec.querySelector(".secondarySection");
@@ -171,7 +174,7 @@ steps = [
 
                     //Check if there're any "OPEN" sections
                     var enrolled = false;
-                    for(var j = 0; j < discussions.length; i++) {
+                    for(var j = 0; j < discussions.length; j++) {
                         var dis = discussions[i];
                         var status = dis.querySelector(".statusColumn>p").innerText;
                         if (status.toLowerCase().indexOf("open") !== -1) {
@@ -202,9 +205,9 @@ steps = [
         page.render("now.png");
         if (! check) {
             testindex--;
-            //console.log("Not loaded yet");
+            console.log("No children");
         } else {
-            //console.log("ready to enroll");
+            console.log("ready to enroll");
             
         }
     },
@@ -213,10 +216,10 @@ steps = [
             var enrollBtn = $("#btn_Enroll");
             var enrollPanel = $("div.row-fluid.enroll")[0];
             if ((!enrollBtn) || (!enrollPanel)) {
-                //console.log(enrollPanel);
+                console.log(enrollPanel);
                 return false;
             }
-            //console.log("found enroll button and panel!")
+            console.log("found enroll button and panel!")
             var checkBoxes = enrollPanel.querySelectorAll("input[type='checkbox']");
             for (var i = 0; i < checkBoxes.length; i++) {
                 checkBoxes[i].click();
@@ -227,9 +230,9 @@ steps = [
         page.render("now.png");
         if (! check) {
             testindex--;
-            //console.log("enroll not loaded yet");
+            console.log("enroll not loaded yet");
         } else {
-            //console.log("Finished action");
+            console.log("Finished action");
         }
     }
 ];
@@ -242,7 +245,7 @@ function executeRequestsStepByStep() {
         testindex++;
     }
     if (typeof steps[testindex] != "function") {
-        //console.log("enroll complete!");
+        console.log("enroll complete!");
         phantom.exit();
     }
 }
